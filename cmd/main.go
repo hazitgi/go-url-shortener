@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	// "github.com/joho/godotenv"
+	"github.com/joho/godotenv"
 
 	"github.com/gin-gonic/gin"
 	database "github.com/hazi-tgi/go-url-shortner/config"
@@ -17,10 +17,10 @@ import (
 var httpAddress string
 
 func init() {
-	// err := godotenv.Load()
-	// if err != nil {
-	// 	log.Fatal("Error loading.env file")
-	// }
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading.env file")
+	}
 	flag.StringVar(&httpAddress, "http-address", ":8080", "HTTP listen address")
 	database.Connect()
 }
