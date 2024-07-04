@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+
+<body>
+
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">URL Shortener</a>
+            </div>
+        </nav>
+
+        <div class="mt-5">
+            <form id="myForm">
+                <div class="mb-5">
+                    <label for="url-text" class="form-label">Past your url here</label>
+                    <input type="text" class="form-control" id="url-text" placeholder="Past URL here....">
+                    <div id="error-area" class="form-text text-danger d-none"></div>
+                    <button type="submit" class="btn btn-primary mt-2">Submit</button>
+                </div>
+            </form>
+
+            <div id="result-area" class="mb-3 d-none">
+                <label for="url-text" class="form-label">Short URL : </label>
+                <span class="h6 text-primary" style="text-decoration: underline;" id="short-url"></span>
+                <br>
+                <button type="submit" class="btn btn-secondary" id="copy">Copy</button>
+            </div>
+
+        </div>
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+
+    <script>
+
+        const form = document.getElementById('myForm');
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const url = document.getElementById('url-text').value;
+            if (url == "") {
+                setError("Please enter a valid url")
+                return;
+            } else {
+                document.getElementById('error-area').classList.add('d-none');
+            }
+
+            const api = `/api/v1/make-short?url=${url}`
+
+            console.log(api, ">>>>>>>>>>>")
+            fetch(api, { method: "GET" }).then((res) => res.json()).then(result => {
+                if (result.success) {
+                    document.getElementById("short-url").innerText = result?.data?.short_url
+                    document.getElementById('result-area').classList.remove('d-none');
+                } else {
+                    throw { message: result?.message }
+                }
+
+            }).catch(err => {
+                setError(err?.message)
+            })
+
+
+        });
+
+        function setError(msg = "internal server error") {
+            document.getElementById("error-area").innerHTML = msg
+            document.getElementById('error-area').classList.remove('d-none');
+        }
+
+        document.getElementById('copy').addEventListener('click', (e) => {
+            let text = document.getElementById("short-url").innerText
+            if (text != "") {
+                // Use the Clipboard API to write the text to the clipboard
+                navigator.clipboard.writeText(text).then(function () {
+                    alert("Text Copied")
+                }).catch(function (err) {
+                    console.error('Failed to copy text: ', err);
+                });
+            } else {
+                alert("No text to copy")
+            }
+
+        })
+
+    </script>
+</body>
+
+</html>
