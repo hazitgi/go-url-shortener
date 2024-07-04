@@ -3,11 +3,13 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/hazi-tgi/go-url-shortner/common"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	// "go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -54,6 +56,17 @@ func (ctrl *UrlControllerImpl) MakeShort(url string) (*common.URLCollection, err
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
+	// create a TTL index
+	indexOptions := options.Index().SetExpireAfterSeconds(30 * 24 * 60 * 60)
+	indexView := ctrl.DB.Collection("urls").Indexes()
+	_, err := indexView.CreateOne(context.Background(), mongo.IndexModel{
+		Keys:    bson.D{{Key: "createdAt", Value: 1}},
+		Options: indexOptions,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	result, err := ctrl.DB.Collection("urls").InsertOne(context.TODO(), newUrlCollection)
 	if err != nil {
 		fmt.Println("Error inserting document: ", err)
