@@ -1,4 +1,4 @@
-run: 
+dev: 
 	go run ./cmd/main.go -http-address=localhost:8000
 
 build: 
