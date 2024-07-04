@@ -29,7 +29,7 @@ func main() {
 	r := gin.Default()
 	flag.Parse()
 
-	gin.SetMode(gin.DebugMode)
+	gin.SetMode(gin.ReleaseMode)
 	r.LoadHTMLGlob("static/*")
 
 	r.GET("/", func(ctx *gin.Context) {
